@@ -1,0 +1,265 @@
+.home-container {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 60px;
+  min-height: calc(100vh - 100px);
+  position: relative;
+  overflow-x: hidden;
+  background: linear-gradient(to right, #DBBA2C 50%, white 50%);
+}
+
+.left-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 50%;
+}
+
+.logo {
+  width: 500px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.tagline {
+  font-size: 30px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.description {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 20px 0;
+  text-align: center;
+  max-width: 400px;
+}
+
+.book-btn {
+  background-color: #2b2c30 !important;
+  color: #ffffff !important;
+  padding: 10px 26px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.btn-epic {
+  position: relative;
+  margin: auto;
+  width: 100%;
+  height: 52px;
+  transform: translate3d(0px, 0%, 0px);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  transition-delay: 0.6s;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.btn-epic::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50% 50% 0 0;
+  transform: translateY(100%) scaleY(0.5);
+  transition: all 0.6s ease;
+  z-index: -1;
+  color: white;
+  background-color: green;
+}
+
+.btn-epic::after {
+  content: "";
+  position: absolute;
+  background-color: skyblue;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: white;
+  border-radius: 0;
+  transform: translateY(0) scaleY(1);
+  transition: all 0.6s ease;
+  z-index: -1;
+}
+
+.btn-epic:hover {
+  transition: background 0.2s linear;
+  transition-delay: 0.6s;
+  color: white;
+  z-index: 0;
+}
+
+.btn-epic:hover::after {
+  border-radius: 0 0 50% 50%;
+  transform: translateY(-100%) scaleY(0.5);
+  transition-delay: 0;
+  color: white;
+}
+
+.btn-epic:hover::before {
+  border-radius: 0;
+  transform: translateY(0) scaleY(1);
+  transition-delay: 0;
+  color: white;
+}
+
+.right-pane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yellow-blob {
+  width: 700px;
+  height: 700px;
+  background: url("../../../public/yellow_blob.png") no-repeat center/contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.image-grid {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.left-images {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blob-img {
+  width: 15vw;
+  height: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.tall-img {
+  width: 150px;
+  height: 252px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #111;
+  color: white;
+  padding: 20px 60px;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    background: white;
+  }
+
+  .left-pane {
+    max-width: 100%;
+    margin-bottom: 40px;
+  }
+
+  .right-pane {
+    order: 2;
+  }
+
+  .yellow-blob {
+    width: 90vw;
+    height: auto;
+    background-size: contain;
+  }
+
+  .blob-img,
+  .tall-img {
+    width: 120px;
+    height: auto;
+  }
+
+  .logo {
+    width: 300px;
+  }
+
+  .book-btn {
+    font-size: 12px;
+    padding: 8px 20px;
+  }
+
+  .description {
+    font-size: 13px;
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .home-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    background: white;
+  }
+
+  .left-pane {
+    max-width: 100%;
+    margin-bottom: 40px;
+  }
+
+  .right-pane {
+    order: 2;
+  }
+
+  .yellow-blob {
+    width: 90vw;
+    height: auto;
+    background-size: contain;
+  }
+
+  .image-grid {
+    gap: 6px;
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  .blob-img {
+    width: 30vw;
+    height: 350px;
+  }
+
+  .logo {
+    width: 300px;
+  }
+
+  .book-btn {
+    font-size: 12px;
+    padding: 8px 20px;
+  }
+
+  .description {
+    font-size: 13px;
+    max-width: 90%;
+  }
+}

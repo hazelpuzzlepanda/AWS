@@ -1,0 +1,40 @@
+.custom-navbar {
+  background: linear-gradient(
+    to right,
+    white 50%,
+    #DBBA2C 40.33% 50%
+  ) !important;
+
+  height: 60px;
+}
+
+.navbar-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  height: 100%;
+}
+
+.menu-button {
+  padding: 0 !important;
+}
+
+.book-now {
+  font-size: 12px;
+  color: white;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* Drawer Styling */
+.drawer-list {
+  width: 300px;
+  cursor: pointer;
+}
+
+.logo {
+  width: 100;
+}

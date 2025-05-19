@@ -1,0 +1,64 @@
+.admin-user-table-container {
+    padding: 40px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+  }
+  
+  .admin-user-table-heading {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: #1877f2; /* Facebook Blue */
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+  
+  
+  .admin-user-table-paper {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .admin-user-table-header {
+    font-weight: bold;
+    font-size: 20px;
+    background-color: #e4e6eb;  /* Facebook-like light grey */
+    color: #050505;
+    padding: 16px;
+    border-bottom: 1px solid #ccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .admin-user-table-date {
+    font-size: 14px;
+    color: #333;
+    padding: 8px 0;
+  }
+  /* Add this class to enable horizontal scroll on mobile */
+  .table-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  /* Optional: mobile friendly tweak */
+  @media (max-width: 768px) {
+    .admin-user-table-container {
+      padding: 20px;
+    }
+  
+    .admin-user-table-heading {
+      font-size: 20px;
+    }
+  
+    .admin-user-table-header {
+      font-size: 14px;
+      padding: 12px;
+    }
+  
+    .admin-user-table-date {
+      font-size: 13px;
+    }
+  }
+  
