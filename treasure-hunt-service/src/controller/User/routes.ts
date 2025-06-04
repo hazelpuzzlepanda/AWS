@@ -12,6 +12,6 @@ userHandler.patch('/update/:id', authenticateUser, authorizeAdminWithPermissions
 userHandler.post('/admin/login', UserController.adminLogin);
 userHandler.post('/refresh-token', UserController.refreshToken);
 userHandler.post('/admin/logout', authenticateUser, authorizeAdminWithPermissions([Permission.UPDATE]), UserController.adminLogout)
-
+userHandler.post('/admin/create-participant', UserController.createParticipant);
 
 export default userHandler;

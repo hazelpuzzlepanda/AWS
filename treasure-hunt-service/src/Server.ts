@@ -46,7 +46,7 @@ export default class Server {
         "http://localhost:3000",         // for local dev
         "https://puzzlepanda.co"       // for production
       ],
-      methods: ["GET", "POST", "OPTIONS"],
+      methods: ["GET", "POST", "OPTIONS","PATCH"],
       credentials: true
     }));
     app.get("/health", (req: Request, res: Response) => {
@@ -67,7 +67,7 @@ export default class Server {
         app.listen(port, () => {
           console.log(`:::App is running successfully at port number: ${port}:::::::`);
           seedQuestionsIfEmpty();
-          startBroadcastJob();
+          // startBroadcastJob();
         });
       })
       .catch((err) => {

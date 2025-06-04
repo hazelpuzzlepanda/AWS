@@ -34,7 +34,6 @@ const AdminDateConfig = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [listLoader, setListLoader] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [deleteDate, setDeleteDate] = useState(null);
   const [page, setPage] = useState(1);
@@ -50,7 +49,6 @@ const AdminDateConfig = () => {
         limit: LIMIT,
       });
       setDisabledDates(response?.data?.lockedDates || []);
-      setTotalCount(response?.data?.count || 0);
       setTotalPages(response?.data?.totalPages || 1);
     } catch (err) {
       console.error("Error fetching dates", err);

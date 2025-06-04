@@ -1,12 +1,16 @@
+import { userModel } from "./../../repositories/user/UserModel";
 import { Request, Response, NextFunction } from "express";
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import UserRepository from "../../repositories/user/UserRepositories";
 import IConfig from "../../config/IConfig";
 import config from "../../config/configuration";
 import IUserModel from "../../repositories/user/IUserModel";
 import { Permission, UserType } from "../../utils/constant";
-import { generateAccessToken, generateRefreshToken } from "../../utils/AuthService";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../../utils/AuthService";
 import sendWhatsAppMessage from "../../libs/twilio-client";
 import QuestionRepository from "../../repositories/questions/QuestionRepositories";
 import dayjs from "dayjs";
@@ -31,17 +35,27 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const { mobileNumber, registrationDate = new Date().toISOString(), teamMemberCount = 5 } = req.body;
-      const userPresented = await this.userRepository.get({ mobileNumber }, {}, { sort: { createdAt: -1 }});
-      if(userPresented && !userPresented.hasVoucher){
+      const {
+        mobileNumber,
+        registrationDate = new Date().toISOString(),
+        teamMemberCount = 5,
+      } = req.body;
+      const userPresented = await this.userRepository.get(
+        { mobileNumber },
+        {},
+        { sort: { createdAt: -1 } }
+      );
+      if (userPresented && !userPresented.hasVoucher) {
         const { createdAt: lastRegistrationDate } = userPresented;
         const lastDate = new Date(lastRegistrationDate);
         const now = new Date();
         const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        if(lastDate > oneDayAgo){
-           const error = new Error('User can not re-registor in 24 hours') as any;
-           error.statusCode = 409;
-           throw error;
+        if (lastDate > oneDayAgo) {
+          const error = new Error(
+            "User can not re-registor in 24 hours"
+          ) as any;
+          error.statusCode = 409;
+          throw error;
         }
       }
       const response: IUserModel = await this.userRepository.create({
@@ -49,21 +63,26 @@ class UserController {
         registrationDate,
         teamMemberCount,
         userType: UserType.USER,
-        permissions: [Permission.CREATE, Permission.READ]
+        permissions: [Permission.CREATE, Permission.READ],
       });
       if (!response._id) {
-        const error = new Error('User has not added successfully') as any;
+        const error = new Error("User has not added successfully") as any;
         error.statusCode = 500;
         throw error;
       }
-      const question: any = await this.questionRepository.get({ isStart: true });
+      const question: any = await this.questionRepository.get({
+        isStart: true,
+      });
       if (!question) {
-        const error = new Error('No Question found') as any;
+        const error = new Error("No Question found") as any;
         error.statusCode = 404;
         throw error;
       }
       await sendWhatsAppMessage(response?.mobileNumber, question?.clue);
-      await this.userRepository.update({ mobileNumber }, { currentSequence: question.sequence });
+      await this.userRepository.update(
+        { mobileNumber },
+        { currentSequence: question.sequence }
+      );
       return res.status(200).json(response);
     } catch (error) {
       console.error(`Error in user create ${error}`);
@@ -71,10 +90,17 @@ class UserController {
     }
   };
 
-  adminLogin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  adminLogin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> => {
     try {
       const { mobileNumber, password } = req.body;
-      const user = await this.userRepository.get({ mobileNumber,  userType: 'admin' });
+      const user = await this.userRepository.get({
+        mobileNumber,
+        userType: "admin",
+      });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -92,8 +118,8 @@ class UserController {
       const accessToken = generateAccessToken(user);
       const refreshToken = generateRefreshToken(user);
       await this.userRepository.updateById(user._id, {
-        refreshToken
-      })
+        refreshToken,
+      });
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: this.config.NODE_ENV === "production",
@@ -108,7 +134,7 @@ class UserController {
   };
 
   adminLogout = async (req: Request, res: Response, next: NextFunction) => {
-     try {
+    try {
       const refreshToken = req.cookies.refreshToken;
       const token = req?.headers?.authorization?.split(" ")[1];
       if (!refreshToken) {
@@ -116,7 +142,10 @@ class UserController {
         error.statusCode = 401;
         throw error;
       }
-      const decodeAccessToken = jwt.verify(token!, this.config.JWT_SECRET!) as any;
+      const decodeAccessToken = jwt.verify(
+        token!,
+        this.config.JWT_SECRET!
+      ) as any;
       const userId = decodeAccessToken?.id;
       const user = await this.userRepository.get({ _id: userId });
       if (!user) {
@@ -124,33 +153,45 @@ class UserController {
         error.statusCode = 404;
         throw error;
       }
-      if(user?.refreshToken !== refreshToken){
-         const error = new Error("No refresh token found") as any;
-         error.statusCode = 400;
-         throw error;
+      if (user?.refreshToken !== refreshToken) {
+        const error = new Error("No refresh token found") as any;
+        error.statusCode = 400;
+        throw error;
       }
       await this.userRepository.updateById(userId, {
-        $unset: { refreshToken: "" }
+        $unset: { refreshToken: "" },
       });
       res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
         sameSite: "strict",
       });
-      return res.status(200).json({ success: true, message: "Logged out successfully" });
-     } catch (error){
-        next(error);
-     }
+      return res
+        .status(200)
+        .json({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+      next(error);
+    }
   };
 
-  list = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  list = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> => {
     try {
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const registrationDate = req.query.registrationDate as string || "";
+      const registrationDate = (req.query.registrationDate as string) || "";
       const skip = (page - 1) * limit;
       const filter: any = { isPaymentSuccessful: { $eq: true } };
-      if(registrationDate) { 
+      if (req.query.quizStatusFilter && req.query.qquizStatusFilter !== "") {
+        const adjustQuizFilter =
+          req.query.quizStatusFilter === "pending" ? false : true;
+        filter.hasVoucher = { $eq: adjustQuizFilter };
+      }
+      if (registrationDate) {
         const requestedDate = new Date(registrationDate);
         const requestedDateUTC = new Date(
           Date.UTC(
@@ -159,11 +200,11 @@ class UserController {
             requestedDate.getUTCDate()
           )
         ).toISOString();
-        filter.registrationDate = { $eq: requestedDateUTC }; 
+        filter.registrationDate = { $eq: requestedDateUTC };
       }
       const [users, totalCount] = await Promise.all([
         this.userRepository.list(filter, {}, { skip, limit }),
-        this.userRepository.countDocuments(filter)
+        this.userRepository.countDocuments(filter),
       ]);
       return res.status(200).json({
         total: totalCount,
@@ -176,9 +217,12 @@ class UserController {
       return next(error);
     }
   };
-  
 
-  refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  refreshToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> => {
     try {
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
@@ -186,17 +230,20 @@ class UserController {
         error.statusCode = 401;
         throw error;
       }
-      const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as any;
+      const decoded = jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET!
+      ) as any;
       const user = await this.userRepository.get({ _id: decoded.id });
       if (!user) {
         const error = new Error("User not found") as any;
         error.statusCode = 404;
         throw error;
       }
-      if(user?.refreshToken !== refreshToken){
-         const error = new Error("No refresh token found") as any;
-         error.statusCode = 400;
-         throw error;
+      if (user?.refreshToken !== refreshToken) {
+        const error = new Error("No refresh token found") as any;
+        error.statusCode = 400;
+        throw error;
       }
       const newAccessToken = generateAccessToken(user);
       return res.status(200).json({ accessToken: newAccessToken });
@@ -239,15 +286,67 @@ class UserController {
           .status(404)
           .json({ message: "User not found or not updated" });
       }
-      const updatedDate = dayjs(registrationDate).format('DD MMM YYYY');
+      const updatedDate = dayjs(registrationDate).format("DD MMM YYYY");
       const message = `🛠️ Update Notice: Your registration date has been updated by the admin to ${updatedDate}.`;
-      if(registrationDate) sendWhatsAppMessage(response.phoneCountryCode, response.mobileNumber, message);
-      return res.status(200).json({ message: "User updated successfully", data: response });
+      if (registrationDate)
+        sendWhatsAppMessage(
+          response.phoneCountryCode,
+          response.mobileNumber,
+          message
+        );
+      return res
+        .status(200)
+        .json({ message: "User updated successfully", data: response });
     } catch (error) {
       next(error);
     }
   };
-  
+  async createParticipant(req: Request, res: Response) {
+    try {
+      const {
+        mobileNumber,
+        registrationDate = new Date().toISOString(),
+        teamMemberCount,
+        fullName,
+        countryCode,
+      } = req.body;
+      if (!mobileNumber || !teamMemberCount || !fullName) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Missing required fields (mobileNumber, teamMemberCount, fullName)",
+        });
+      }
+
+      const participantData = {
+        mobileNumber,
+        isPaymentSuccessful: true,
+        isPaymentPending: false,
+        isPaymentError: false,
+        registrationDate,
+        teamMemberCount: Number(teamMemberCount),
+        fullName,
+        phoneCountryCode: countryCode || "44",
+        userType: UserType.USER,
+        permissions: [Permission.CREATE, Permission.READ],
+      };
+
+      const response = await userModel.create(participantData);
+
+      return res.status(201).json({
+        success: true,
+        data: response,
+        message: "Participant created successfully",
+      });
+    } catch (error: any) {
+      console.error("Error creating participant:", error);
+      return res.status(500).json({
+        success: false,
+        error: error.message,
+        message: "Failed to create participant",
+      });
+    }
+  }
 }
 
 export default UserController.getInstance();

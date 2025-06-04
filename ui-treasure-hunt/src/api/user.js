@@ -12,10 +12,11 @@ const registorUser = (dataToPost) => {
     );
 };
 
-const listOfUser = (page = 0, limit = 5, filter) => {
+const listOfUser = (page = 0, limit = 5,quizStatusFilter, filter) => {
   return AxiosInterceptor.get("/api/user/list",{ params: {
     page,
     limit,
+    quizStatusFilter,
     ...filter
   }},{ withCredentials: true });
 };
@@ -45,4 +46,8 @@ const adminLogout = (credentials = {}) => {
   });
 }
 
-export { registorUser, listOfUser, updateUserRegistrationDate, adminLogin, adminLogout };
+const createParticipant = (credentials = {}) => {
+  return AxiosInterceptor.post("/api/user/admin/create-participant", credentials);
+}
+
+export { registorUser, listOfUser, updateUserRegistrationDate, adminLogin, adminLogout,createParticipant };

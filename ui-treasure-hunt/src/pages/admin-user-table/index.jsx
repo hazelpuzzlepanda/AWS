@@ -19,6 +19,10 @@ import {
   DialogActions,
   Button,
   Dialog,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -27,6 +31,8 @@ import { listOfUser, updateUserRegistrationDate } from "../../api/user";
 import Loader from "../../components/loader";
 import { useToast } from "../../components/toaster";
 import { publicListOfLockedDates } from "../../api/dates-api";
+import ParticipantAddForm from "./participant-add-form";
+import {Person2Outlined} from '@mui/icons-material'
 
 const AdminUserTable = () => {
   const [users, setUsers] = useState([]);
@@ -34,6 +40,7 @@ const AdminUserTable = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
+  const [userAdded,setUserAdded] = useState(false)
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedDate, setSelectedDate] = useState(null);
@@ -42,11 +49,19 @@ const AdminUserTable = () => {
   const [tempDate, setTempDate] = useState({});
   const [userId, setUserId] = useState(null);
   const [disableDates, setDisableDates] = useState([]);
+  const [isParticipantFormOpen,setIsParticipantFormOpen] = useState(false)
+
+    const [quizStatusFilter, setQuizStatusFilter] = useState("");
   const { showToast } = useToast();
   const fetchUsers = (pageNo) => {
+
     setLoader(true);
     const pageNumber = pageNo ? pageNo : page;
-    listOfUser(pageNumber, rowsPerPage)
+    if(userAdded)
+    {
+      setQuizStatusFilter('')
+    }
+    listOfUser(pageNumber, rowsPerPage,quizStatusFilter)
       .then((response) => {
         const { users = [], total = 0 } = response.data;
         setUsers(users);
@@ -57,11 +72,12 @@ const AdminUserTable = () => {
       })
       .finally(() => {
         setLoader(false);
+        setUserAdded(false)
       });
   };
   useEffect(() => {
     fetchUsers();
-  }, [page]);
+  }, [page,userAdded,quizStatusFilter]);
 
   useEffect(() => {
       setLoader(true);
@@ -100,6 +116,10 @@ const AdminUserTable = () => {
       });
   };
   const handleUserDateValues = (newDate, previousRegistrationDate, userId) => {
+     if (newDate && newDate?.isBefore?.(dayjs()?.startOf?.('day'))) {
+      showToast('Cannot select past dates', 'error');
+      return;
+    }
     const formattedNewDate = dayjs(newDate).format("YYYY-MM-DD");
     const oldDate = dayjs(previousRegistrationDate).format("YYYY-MM-DD");
     if (formattedNewDate === oldDate) return;
@@ -167,17 +187,24 @@ const AdminUserTable = () => {
             p: 1,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
             <DatePicker
               label="Filter by Registration Date"
               value={selectedDate}
               onChange={(newValue) => handleRegistrationFilter(newValue)}
-              sx={{
-                ml: 2,
-              }}
               format="DD/MM/YYYY"
+              sx={{ width: { xs: "100%", sm: "auto" }, ml: { sm: 2 } }}
               slotProps={{ textField: { size: "small" } }}
             />
+
             <Button
               variant="outlined"
               size="small"
@@ -185,13 +212,63 @@ const AdminUserTable = () => {
               disabled={!selectedDate}
               sx={{
                 pt: 0.9,
-                pb: 0.9
+                pb: 0.9,
+                width: { xs: "100%", sm: "auto" },
               }}
             >
               Clear
             </Button>
-          </Box>
 
+            <FormControl size="small" sx={{ minWidth: 180, width: { xs: "100%", sm: "auto" } }}>
+              <InputLabel id="quiz-status-label">Quiz Status</InputLabel>
+              <Select
+                labelId="quiz-status-label"
+                label="Quiz Status"
+                value={quizStatusFilter}
+                onChange={(e) => {
+                  setQuizStatusFilter(e.target.value);
+                  fetchUsers(1);
+                  setPage(1);
+                }}
+              >
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="completed">Completed</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Button
+              variant="contained"
+              onClick={() => setIsParticipantFormOpen(true)}
+              fullWidth={isMobile}
+              sx={{
+                textTransform: "none",
+                ml: { sm: "auto" },
+                mr: { xs: 0, sm: 2 },
+                px: 3,
+                py: 1,
+                borderRadius: "8px",
+                fontWeight: 600,
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                "&:hover": {
+                  boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                  transform: "translateY(-1px)",
+                },
+                transition: "all 0.2s ease-in-out",
+                background: "linear-gradient(45deg, #1976d2 30%, #2196f3 90%)",
+                color: "#fff",
+              }}
+              startIcon={!isMobile && <Person2Outlined />}
+            >
+              Add Participant
+            </Button>
+
+            <ParticipantAddForm
+              setIsParticipantFormOpen={setIsParticipantFormOpen}
+              isParticipantFormOpen={isParticipantFormOpen}
+              setUserAdded={setUserAdded}
+            />
+          </Box>
           <TableContainer
             component={Paper}
             elevation={3}

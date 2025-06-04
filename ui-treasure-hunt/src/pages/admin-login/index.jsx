@@ -1,13 +1,11 @@
 // AdminLogin.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   TextField,
   Button,
   Typography,
   Paper,
-  useMediaQuery,
-  useTheme,
   Avatar,
   CircularProgress,
   InputAdornment,
@@ -24,8 +22,6 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../components/toaster';
 
 const AdminLogin = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
