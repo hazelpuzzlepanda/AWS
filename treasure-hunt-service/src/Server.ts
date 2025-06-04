@@ -46,7 +46,7 @@ export default class Server {
         "http://localhost:3000",         // for local dev
         "https://puzzlepanda.co"       // for production
       ],
-      methods: ["GET", "POST", "OPTIONS","PATCH"],
+      methods: ["GET", "POST", "OPTIONS","PATCH","DELETE"],
       credentials: true
     }));
     app.get("/health", (req: Request, res: Response) => {

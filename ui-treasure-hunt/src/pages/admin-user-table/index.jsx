@@ -27,12 +27,12 @@ import {
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { listOfUser, updateUserRegistrationDate } from "../../api/user";
+import { deleteUser, listOfUser, updateUserRegistrationDate } from "../../api/user";
 import Loader from "../../components/loader";
 import { useToast } from "../../components/toaster";
 import { publicListOfLockedDates } from "../../api/dates-api";
 import ParticipantAddForm from "./participant-add-form";
-import {Person2Outlined} from '@mui/icons-material'
+import {DeleteOutline, Person2Outlined} from '@mui/icons-material'
 
 const AdminUserTable = () => {
   const [users, setUsers] = useState([]);
@@ -165,6 +165,23 @@ const AdminUserTable = () => {
     fetchUsers(1);
     page !== 1 && setPage(1);
     setSelectedDate(null);
+  }
+  const handleDeleteUser = (id)=>{
+     if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    setLoader(true);
+  deleteUser(id) 
+    .then(() => {
+      showToast("User deleted successfully", "success");
+      setPage(1)
+      fetchUsers(); 
+    })
+    .catch(() => {
+      showToast("Failed to delete user", "error");
+    })
+    .finally(() => {
+      setLoader(false);
+    });
   }
 
   return loader ? (
@@ -354,6 +371,16 @@ const AdminUserTable = () => {
                   >
                     Participants
                   </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                      color: "#808080",
+                    }}
+                  >
+                    Delete
+                  </TableCell>
                 </TableRow>
               </TableHead>
               {users && !!users.length ? (
@@ -448,6 +475,20 @@ const AdminUserTable = () => {
                         }}
                       >
                         {user?.teamMemberCount}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          textAlign: "center",
+                        }}
+                      >
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDeleteUser(user._id)}
+                        >
+                          <DeleteOutline fontSize="small" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

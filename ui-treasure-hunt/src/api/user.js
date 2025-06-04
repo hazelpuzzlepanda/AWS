@@ -50,4 +50,7 @@ const createParticipant = (credentials = {}) => {
   return AxiosInterceptor.post("/api/user/admin/create-participant", credentials);
 }
 
-export { registorUser, listOfUser, updateUserRegistrationDate, adminLogin, adminLogout,createParticipant };
+ const deleteUser = (userId) => {
+  return AxiosInterceptor.delete(`/api/user/admin/delete-participant/${userId}`);
+};
+export { registorUser, listOfUser, updateUserRegistrationDate, adminLogin, adminLogout,createParticipant,deleteUser };
