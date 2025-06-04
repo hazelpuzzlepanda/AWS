@@ -105,9 +105,10 @@ const ParticipantAddForm = ({
     try {
       setIsSubmitting(true);
       setError(null);
+      const formattedNewDate = dayjs(formData.registrationDate).format("YYYY-MM-DD");
       const formatedData = {
         ...formData,
-        registrationDate: new Date(formData.registrationDate).toString(),
+        registrationDate: new Date(formattedNewDate),
       }
       const response = await createParticipant(formatedData);
 

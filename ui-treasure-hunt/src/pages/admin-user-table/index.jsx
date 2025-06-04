@@ -76,8 +76,14 @@ const AdminUserTable = () => {
       });
   };
   useEffect(() => {
+    if(selectedDate)
+    {
+      handleRegistrationFilter(selectedDate)
+    }
+    else{
     fetchUsers();
-  }, [page,userAdded,quizStatusFilter]);
+    }
+  }, [page,userAdded,quizStatusFilter,selectedDate]);
 
   useEffect(() => {
       setLoader(true);
@@ -101,7 +107,7 @@ const AdminUserTable = () => {
 
   const handleRegistrationFilter = (val) => {
     const registrationDate = val ? dayjs(val).format("YYYY-MM-DD") : undefined;
-    listOfUser(page, rowsPerPage, { registrationDate })
+    listOfUser(page, rowsPerPage, quizStatusFilter, { registrationDate })
       .then((resp) => {
         const { users = [], total = 0 } = resp.data;
         setUsers(users);
@@ -116,11 +122,12 @@ const AdminUserTable = () => {
       });
   };
   const handleUserDateValues = (newDate, previousRegistrationDate, userId) => {
-     if (newDate && newDate?.isBefore?.(dayjs()?.startOf?.('day'))) {
+    const newDateWithMethod = dayjs(newDate)
+    if (newDateWithMethod && newDateWithMethod.isBefore(dayjs().startOf('day')) ) {
       showToast('Cannot select past dates', 'error');
       return;
     }
-    const formattedNewDate = dayjs(newDate).format("YYYY-MM-DD");
+    const formattedNewDate = dayjs(newDateWithMethod).format("YYYY-MM-DD");
     const oldDate = dayjs(previousRegistrationDate).format("YYYY-MM-DD");
     if (formattedNewDate === oldDate) return;
     setTempDate(formattedNewDate);
